@@ -1,0 +1,10 @@
+{
+  "appId": "com.yblig.comethop",
+  "appName": "Comet Hop",
+  "webDir": "dist",
+  "android": { "backgroundColor": "#000000" },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 600, "launchAutoHide": true, "showSpinner": false },
+    "SystemBars": { "insetsHandling": "css", "hidden": true }
+  }
+}

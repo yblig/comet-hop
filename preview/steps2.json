@@ -1,0 +1,13 @@
+[
+  {"wait": 7000}, {"shot": "title"},
+  {"eval": "__game.scene.getScene('Title').openOverlay('Settings')"}, {"wait": 2500}, {"shot": "settings"},
+  {"eval": "__game.scene.getScene('Settings').close()"}, {"wait": 1500},
+  {"eval": "__game.scene.getScene('Title').scene.start('Skins')"}, {"wait": 4000}, {"shot": "skins"},
+  {"eval": "__game.scene.getScene('Skins').scene.start('Game')"}, {"wait": 5000},
+  {"eval": "__debug.dtCap = 700; (async()=>{for(let i=0;i<4;i++){__debug.debugHop(0.8); await new Promise(r=>setTimeout(r,2600));}})()"},
+  {"wait": 11000}, {"shot": "game-hops"},
+  {"eval": "__debug.debugSkip(30)"}, {"wait": 4000}, {"shot": "asteroids"},
+  {"eval": "__debug.debugSkip(50)"}, {"wait": 4000}, {"shot": "blackholes"},
+  {"eval": "JSON.stringify(__debug.planets.map(p=>p.body.texture.key))"},
+  {"eval": "__debug.openPause()"}, {"wait": 2500}, {"shot": "pause"}
+]

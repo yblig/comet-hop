@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Comet Hop</string>
+    <string name="title_activity_main">Comet Hop</string>
+    <string name="package_name">com.yblig.comethop</string>
+    <string name="custom_url_scheme">com.yblig.comethop</string>
+</resources>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="g2" cx="36%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#ebdcff"/><stop offset=".5" stop-color="#b48cff"/><stop offset="1" stop-color="#7650cf"/>
+    </radialGradient>
+    <clipPath id="c2"><circle cx="128" cy="128" r="110"/></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="110" fill="url(#g2)"/>
+  <g clip-path="url(#c2)">
+    <path d="M0 64.45756783522666 Q64 52.08827953413129 128 64.45756783522666 T256 64.45756783522666 V85.82997351977974 Q192 98.19926182087511 128 85.82997351977974 T0 85.82997351977974Z" fill="#9a70f0" opacity=".8"/><path d="M0 109.93276045517996 Q64 101.56688993470743 128 109.93276045517996 T256 109.93276045517996 V125.07855209894478 Q192 133.4444226194173 128 125.07855209894478 T0 125.07855209894478Z" fill="#9a70f0" opacity=".8"/><path d="M0 147.19651737157255 Q64 134.8456401443109 128 147.19651737157255 T256 147.19651737157255 V161.4530817484483 Q192 173.80395897570997 128 161.4530817484483 T0 161.4530817484483Z" fill="#9a70f0" opacity=".8"/><path d="M0 188.18009884981439 Q64 179.06116523547098 128 188.18009884981439 T256 188.18009884981439 V208.75879727303982 Q192 217.87773088738322 128 208.75879727303982 T0 208.75879727303982Z" fill="#9a70f0" opacity=".8"/>
+    <path d="M-20-20H280V280H-20Z M128 22a106 106 0 1 0 0.1 0Z" transform="translate(-26 -26)" fill="#140f33" opacity=".28" fill-rule="evenodd"/>
+    <circle cx="128" cy="128" r="104" fill="none" stroke="#fff" stroke-width="6" opacity=".12" transform="translate(4 -4)"/>
+  </g>
+  <circle cx="128" cy="128" r="110" fill="none" stroke="#140f33" stroke-width="10"/>
+  <ellipse cx="80" cy="66" rx="30" ry="16" fill="#fff" opacity=".55" transform="rotate(-32 80 66)"/>
+  <circle cx="58" cy="96" r="6" fill="#fff" opacity=".5"/></svg>
