@@ -115,8 +115,8 @@ export const ICONS = {
 
 export const SHAPES = [
   '<svg class="shape" viewBox="0 0 40 40"><path d="M20 5l16 28H4z" fill="#fff" stroke="#0b0720" stroke-width="3" stroke-linejoin="round"/></svg>',
-  '<svg class="shape" viewBox="0 0 40 40"><path d="M20 3l17 17-17 17L3 20z" fill="#fff" stroke="#0b0720" stroke-width="3" stroke-linejoin="round"/></svg>',
-  '<svg class="shape" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#fff" stroke="#0b0720" stroke-width="3"/></svg>',
+  '<svg class="shape" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="#0b0720" stroke-width="11"/><circle cx="20" cy="20" r="15" fill="none" stroke="#fff" stroke-width="6"/></svg>',
+  '<svg class="shape" viewBox="0 0 40 40"><path d="M9 9l22 22M31 9L9 31" stroke="#0b0720" stroke-width="12" stroke-linecap="round"/><path d="M9 9l22 22M31 9L9 31" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
   '<svg class="shape" viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" rx="4" fill="#fff" stroke="#0b0720" stroke-width="3"/></svg>'
 ];
 

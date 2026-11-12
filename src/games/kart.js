@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { getRenderer, releaseRenderer, loop, disposeScene, canvasTexture, blobMesh, blobShadow, hexNum } from './three-common.js';
 import { h, PCOLORS, btn } from '../ui/dom.js';
 import { audio } from '../lib/audio.js';
+import { isLite } from '../lite.js';
+import { nav } from '../input/nav.js';
 
 const S = 1.45, W = 17, N = 900, LAPS = 3;
 const PTS = [[0, 0], [80, -6], [150, 10], [190, 60], [180, 120], [130, 150], [80, 132], [50, 92], [0, 88], [-50, 120], [-110, 122], [-152, 80], [-142, 22], [-80, -10]];
@@ -128,7 +130,7 @@ export function createKart(session, root, humans) {
   // scenery: instanced trees, far mountains, clouds
   const near = (x, z, min) => { for (let i = 0; i < N; i += 6) { const dx = P[i].x - x, dz = P[i].z - z; if (dx * dx + dz * dz < min * min) return true; } return false; };
   const treeSpots = [];
-  for (let tries = 0; tries < 1400 && treeSpots.length < 170; tries++) {
+  for (let tries = 0; tries < 1400 && treeSpots.length < (isLite() ? 70 : 170); tries++) {
     const x = THREE.MathUtils.randFloat(-330, 360), z = THREE.MathUtils.randFloat(-140, 340);
     if (!near(x, z, W / 2 + 12)) treeSpots.push([x, z, THREE.MathUtils.randFloat(0.8, 1.5)]);
   }
@@ -151,7 +153,7 @@ export function createKart(session, root, humans) {
     scene.add(m);
   }
   const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xc8d4f0, emissiveIntensity: 0.7, roughness: 1, flatShading: true });
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < (isLite() ? 5 : 14); i++) {
     const c = new THREE.Group();
     for (let k = 0; k < 4; k++) { const s = new THREE.Mesh(new THREE.IcosahedronGeometry(8 + Math.random() * 6, 0), cloudMat); s.position.set(k * 9 - 13, Math.random() * 4, Math.random() * 6); c.add(s); }
     c.position.set(THREE.MathUtils.randFloat(-350, 400), THREE.MathUtils.randFloat(70, 110), THREE.MathUtils.randFloat(-200, 380));

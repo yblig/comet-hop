@@ -5,6 +5,9 @@ import { haptics } from '../lib/haptics.js';
 import { native } from '../lib/native.js';
 import { hostScreen } from '../host/host.js';
 import { joinScreen } from '../controller/controller.js';
+import { TOOLS, openTool } from '../tools/index.js';
+import { isLite, setLite } from '../lite.js';
+import { listPads } from '../input/pads.js';
 
 export function homeScreen(root) {
   audio.playMusic('music_lobby');
@@ -20,19 +23,42 @@ export function homeScreen(root) {
   padBtn.append(svgEl(ICONS.pad), h('span', {}, 'Jadi Controller', h('small', {}, 'Gabung ke room teman')));
   padBtn.querySelector('svg').classList.add('ico');
 
+  const padInfo = h('div', { class: 'mini' });
+  const updPads = () => { const n = listPads().length; padInfo.textContent = n ? `🎮 ${n} stik terdeteksi — pilih "Jadi Layar" untuk main` : ''; };
+  updPads(); const pi = setInterval(updPads, 1500);
   const main = h('div', { class: 'home-main' },
     h('div', { class: 'home-hero' },
       h('div', { class: 'logo bob' }, h('span', { class: 'a' }, 'MABAR'), h('span', { class: 'b' }, 'PARTY!')),
       blobs,
-      h('p', { class: 'dim', style: { margin: 0, fontSize: 'clamp(13px,3.2vh,18px)', textAlign: 'center' } }, '1 layar · sampai 4 pemain · pakai HP masing-masing')),
+      h('p', { class: 'dim', style: { margin: 0, fontSize: 'clamp(13px,3.2vh,18px)', textAlign: 'center' } }, '20 game · 30 alat · HP & stik PS sampai 4 pemain'),
+      padInfo),
     h('div', { class: 'home-actions' }, hostBtn, padBtn,
       h('div', { class: 'row', style: { justifyContent: 'center', gap: '18px' } },
+        btn('Alat', 'dark small', () => go(toolsMenu), { icon: 'help' }),
         btn(null, 'dark round', () => settingsDialog(), { icon: 'gear' }),
         btn(null, 'dark round', () => helpDialog(), { icon: 'help' }))));
   const wrap = h('div', { class: 'screen', style: { animation: 'none' } }, main);
   root.append(bg, wrap);
   native.hideSplash();
   onScreenBack(() => false);
+  hostBtn.dataset.autofocus = '';
+  return () => clearInterval(pi);
+}
+
+// Tools without a room (works on the TV with the remote, or on a phone)
+export function toolsMenu(root) {
+  root.style.padding = '0';
+  root.append(h('div', { class: 'party-bg' }, h('div', { class: 'confetti-dots' })));
+  const grid = h('div', { class: 'tgrid' });
+  TOOLS.forEach(t => {
+    const b = h('button', { class: 'tool nav-item', type: 'button' }, h('div', { class: 'ti' }, t.icon), h('div', { class: 'tn' }, t.name), t.net ? h('div', { class: 'tnet' }, '📱') : null);
+    b.addEventListener('click', () => { audio.play('confirm'); go(r => { const inst = openTool(t, r, null); onScreenBack(() => { go(toolsMenu); return true; }); return () => inst.destroy?.(); }); });
+    grid.append(b);
+  });
+  root.append(h('div', { class: 'screen', style: { animation: 'none' } },
+    h('div', { class: 'topbar' }, btn(null, 'dark round', () => go(homeScreen), { icon: 'back', sound: 'back' }), h('h2', { class: 'title-m grow' }, 'Alat (30)'), h('div', { class: 'mini' }, '📱 = bisa ikut pakai HP lewat lobby host')),
+    grid));
+  onScreenBack(() => { go(homeScreen); return true; });
 }
 
 export function settingsDialog() {
@@ -48,6 +74,7 @@ export function settingsDialog() {
       row('Musik', () => audio.settings.music > 0, v => audio.set({ music: v ? 0.55 : 0 })),
       row('Efek suara', () => audio.settings.sfx > 0, v => audio.set({ sfx: v ? 1 : 0 })),
       row('Getar', () => haptics.isEnabled(), v => { haptics.setEnabled(v); if (v) haptics.medium(); }),
+      row('Mode hemat (TV) — animasi minimal', () => isLite(), v => setLite(v)),
       h('p', { class: 'mini', style: { textAlign: 'center', margin: '4px 0 0' } }, 'Mabar Party v1.0 · dibuat dengan Claude'),
       h('div', { class: 'center' }, btn('Oke', 'cyan small', close, { icon: 'check' })));
   });

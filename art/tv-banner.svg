@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3d8b"/><stop offset=".6" stop-color="#8a5cff"/><stop offset="1" stop-color="#2a1a7a"/></linearGradient>
+  <linearGradient id="t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bff6ff"/></linearGradient></defs>
+  <rect width="640" height="360" fill="url(#g)"/>
+  <g transform="translate(36 92) scale(.34)"><path d="M330 380h364c80 0 120 80 128 190s-12 170-74 170c-50 0-78-70-120-92H396c-42 22-70 92-120 92-62 0-82-60-74-170s48-190 128-190z" fill="#fff" stroke="#0b0720" stroke-width="30" stroke-linejoin="round"/><path d="M330 500v120M270 560h120" stroke="#0b0720" stroke-width="40" stroke-linecap="round"/><circle cx="660" cy="520" r="34" fill="#ff4d6d" stroke="#0b0720" stroke-width="14"/><circle cx="740" cy="590" r="34" fill="#3ddc84" stroke="#0b0720" stroke-width="14"/><circle cx="660" cy="640" r="30" fill="#ffc93c" stroke="#0b0720" stroke-width="14"/><circle cx="740" cy="480" r="30" fill="#3ab0ff" stroke="#0b0720" stroke-width="14"/></g>
+  <text x="400" y="170" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="88" fill="url(#t)" stroke="#0b0720" stroke-width="10" paint-order="stroke">MABAR</text>
+  <text x="400" y="262" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="64" fill="#ffd23f" stroke="#0b0720" stroke-width="9" paint-order="stroke">PARTY!</text>
+</svg>

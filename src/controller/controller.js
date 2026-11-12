@@ -104,7 +104,7 @@ function padScreen(root, code) {
   const resetInput = () => { Object.assign(st.input, { x: 0, y: 0, gas: false, brake: false, l: false, r: false, a: false, b: false, steer: 0 }); sendInput(true); };
 
   function applyLayout(l, data) {
-    if (st.layout === l && !['results', 'lobby', 'menu', 'wait'].includes(l)) return;
+    if (st.layout === l && !['results', 'lobby', 'menu', 'wait', 'secret', 'vote', 'score', 'sound', 'buttons', 'pad'].includes(l)) return;
     st.layout = l;
     layoutCleanup?.(); layoutCleanup = null; quizMsg = null;
     resetInput();
@@ -265,6 +265,96 @@ const LAYOUTS = {
         bs.forEach((x, k) => { x.classList.toggle('dim', k !== m.correct); x.classList.toggle('picked', k === m.correct); });
       }
     });
+  },
+
+
+  // generic joystick + up to two action buttons (most 2D games)
+  pad(body, d, { st, sendInput }) {
+    const joy = joystick((x, y) => { st.input.x = x; st.input.y = y; st.input.steer = x; st.input.l = x < -0.3; st.input.r = x > 0.3; sendInput(); });
+    const right = h('div', { class: 'pad', style: { flexDirection: 'column', gap: '14px' } });
+    if (d.a) { const a = holdBtn('dash', null, on => { st.input.a = on; st.input.gas = on; sendInput(); }); a.append(d.a); a.style.width = d.b ? 'min(30vh, 30vw)' : 'min(44vh, 40vw)'; a.style.height = a.style.width; right.append(a); }
+    if (d.b) { const b = holdBtn('', null, on => { st.input.b = on; st.input.brake = on; sendInput(); }); b.append(d.b); b.style.width = 'min(26vh, 26vw)'; b.style.height = b.style.width; b.style.borderRadius = '50%'; right.append(b); }
+    right.append(h('div', { class: 'mini' }, d.hint || d.game || ''));
+    body.append(h('div', { class: 'pad' }, joy), right);
+  },
+
+  // one or two big buttons (mash games, reflex, buzzer)
+  buttons(body, d, { st, sendInput }) {
+    const mk = (label, key, cls) => { const b = holdBtn(cls, null, on => { st.input[key] = on; if (key === 'a') st.input.gas = on; sendInput(); }); b.append(label); b.style.flex = '1'; b.style.height = '100%'; b.style.fontSize = 'clamp(26px, 9vh, 56px)'; return b; };
+    const wrap = h('div', { class: 'pad', style: { alignItems: 'stretch', gap: '18px' } });
+    if (d.b) wrap.append(mk(d.b, 'b', ''));
+    wrap.append(mk(d.a || 'TEKAN', 'a', 'gas'));
+    body.style.flexDirection = 'column';
+    body.append(h('div', { class: 'mini', style: { textAlign: 'center' } }, d.hint || ''), wrap);
+  },
+
+  vote(body, d, { send }) {
+    const cols = ['gas', 'brake', 'q1', 'q2', 'q3'];
+    let mine = -1;
+    const bs = (d.opts || []).map((o, i) => { const b = tapBtn(cols[i % 5], null, () => { mine = i; send({ t: 'vote', i }); bs.forEach((x, k) => x.classList.toggle('picked', k === mine)); haptics.success(); }); b.append(o); b.style.flex = '1'; b.style.fontSize = 'clamp(16px, 6vh, 32px)'; return b; });
+    body.style.flexDirection = 'column';
+    body.append(h('div', { class: 'title-m', style: { textAlign: 'center' } }, 'Pilih jawabanmu!'), h('div', { class: 'pad', style: { alignItems: 'stretch', flexWrap: 'wrap' } }, bs));
+  },
+
+  draw(body, d, { st, send }) {
+    const cv = h('canvas', { class: 'drawcanvas' });
+    const palette = ['#0b0720', st.color, '#ff4d6d', '#3ab0ff', '#ffc93c', '#3ddc84', '#8a5cff', '#ffffff'];
+    let col = st.color, w = 8, pts = [], startNew = true, last = 0;
+    const tools = h('div', { class: 'col', style: { gap: '8px', justifyContent: 'center' } },
+      ...palette.map(c => { const b = h('div', { style: { width: '40px', height: '40px', borderRadius: '50%', background: c, border: '4px solid #fff', boxShadow: '0 0 0 3px #0b0720' } }); b.addEventListener('pointerdown', () => { col = c; w = c === '#ffffff' ? 30 : 8; haptics.tap(); }); return b; }),
+      btn(null, 'dark round small', () => send({ t: 'clear' }), { icon: 'close' }));
+    const fit = () => { const r = body.getBoundingClientRect(); const ww = Math.max(100, r.width - 80), hh = Math.max(80, r.height - 10); const s = Math.min(ww / 16, hh / 9); cv.width = 16 * s; cv.height = 9 * s; cv.style.width = cv.width + 'px'; cv.style.height = cv.height + 'px'; const x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, cv.width, cv.height); };
+    const flush = () => { if (!pts.length) return; send({ t: 'draw', p: pts, c: col, w, s: startNew }); startNew = false; pts = pts.slice(-2); };
+    let prev = null;
+    cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); startNew = true; pts = []; prev = null; add(e); });
+    cv.addEventListener('pointermove', e => { if (e.buttons || e.pressure > 0) add(e); });
+    cv.addEventListener('pointerup', () => { flush(); prev = null; });
+    function add(e) {
+      const r = cv.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      const c = cv.getContext('2d'); c.strokeStyle = col; c.lineWidth = w * cv.width / 1280 * 1.4; c.lineCap = 'round';
+      if (prev) { c.beginPath(); c.moveTo(prev[0] * cv.width, prev[1] * cv.height); c.lineTo(x * cv.width, y * cv.height); c.stroke(); }
+      prev = [x, y]; pts.push(+x.toFixed(4), +y.toFixed(4));
+      if (performance.now() - last > 50) { last = performance.now(); flush(); }
+    }
+    body.append(tools, h('div', { class: 'pad' }, cv));
+    setTimeout(fit, 30);
+    addEventListener('resize', fit);
+    return () => removeEventListener('resize', fit);
+  },
+
+  text(body, d, { send }) {
+    const inp = h('input', { class: 'field', maxlength: 80, placeholder: 'Tulis pesan untuk layar…' });
+    const go = () => { const v = inp.value.trim(); if (!v) return; send({ t: 'text', v }); inp.value = ''; haptics.success(); toast('Terkirim ke layar!'); };
+    inp.addEventListener('keydown', e => e.key === 'Enter' && go());
+    body.style.flexDirection = 'column'; body.style.justifyContent = 'center';
+    body.append(h('h2', { class: 'title-m', style: { textAlign: 'center' } }, 'Teks Berjalan'), inp, h('div', { class: 'center' }, btn('KIRIM', 'pink', go, { icon: 'play' })));
+  },
+
+  emoji(body, d, { send }) {
+    const E = ['😂', '😍', '👏', '🔥', '😱', '🤣', '😎', '🥳', '💯', '❤️', '👍', '😭'];
+    const grid = h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '10px', flex: 1 } }, E.map(e => { const b = tapBtn('', null, () => send({ t: 'emoji', v: e })); b.append(e); b.style.fontSize = 'clamp(28px, 10vh, 54px)'; b.style.background = 'linear-gradient(#3a2c86,#241656)'; return b; }));
+    body.append(grid);
+  },
+
+  sound(body, d, { send }) {
+    const grid = h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', flex: 1 } }, (d.items || []).map((s, i) => { const b = tapBtn(i % 2 ? '' : 'q0', null, () => send({ t: 'sound', i })); b.append(s); b.style.fontSize = 'clamp(13px, 4vh, 20px)'; return b; }));
+    body.append(grid);
+  },
+
+  score(body, d, { send }) {
+    const cols = ['q0', 'q1', 'q2', 'q3'];
+    const grid = h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(${d.teams || 2}, 1fr)`, gap: '12px', flex: 1 } });
+    for (let i = 0; i < (d.teams || 2); i++) {
+      const plus = tapBtn(cols[i], null, () => send({ t: 'score', i, d: 1 })); plus.append(`TIM ${'ABCD'[i]}`, h('small', {}, '+1')); plus.style.flex = '1';
+      const minus = tapBtn('', null, () => send({ t: 'score', i, d: -1 })); minus.append('−1'); minus.style.height = '60px';
+      grid.append(h('div', { class: 'col', style: { gap: '8px' } }, plus, minus));
+    }
+    body.append(grid);
+  },
+
+  secret(body, d, { st }) {
+    message(body, 'cool', d.title || '', d.sub || '', st.color);
+    body.querySelector('h2').style.fontSize = 'clamp(36px, 14vh, 80px)';
   },
 
   wait(body, d, { st }) { message(body, 'happy', d.title || 'Tunggu sebentar…', d.sub || 'Lihat layar utama', st.color); },

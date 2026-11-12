@@ -1,12 +1,13 @@
 // Shared three.js renderer + helpers for the 3D games.
 import * as THREE from 'three';
 import { sceneEl } from '../app.js';
+import { isLite } from '../lite.js';
 
 let renderer = null;
 
 export function getRenderer() {
   if (!renderer) {
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: !isLite(), powerPreference: 'high-performance' });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -14,7 +15,7 @@ export function getRenderer() {
   const el = sceneEl();
   if (renderer.domElement.parentNode !== el) el.append(renderer.domElement);
   renderer.domElement.style.display = 'block';
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.6));
+  renderer.setPixelRatio(isLite() ? Math.min(1, window.devicePixelRatio || 1) : Math.min(window.devicePixelRatio || 1, 1.6));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   return renderer;
 }
