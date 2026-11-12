@@ -1,24 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <defs>
-    <linearGradient id="tr" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2a7bff" stop-opacity="0"/><stop offset=".6" stop-color="#3ff0ff" stop-opacity=".8"/><stop offset="1" stop-color="#e6fdff"/></linearGradient>
-    <radialGradient id="cg" cx="38%" cy="34%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#3ff0ff"/><stop offset="1" stop-color="#1f8fd6"/></radialGradient>
-    <radialGradient id="gl" cx="50%" cy="50%" r="50%"><stop offset=".4" stop-color="#3ff0ff" stop-opacity=".6"/><stop offset="1" stop-color="#3ff0ff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="sf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset="1" stop-color="#ff9d2e"/></linearGradient>
-  </defs>
-  <!-- orbit ring -->
-  <ellipse cx="512" cy="540" rx="290" ry="290" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="40 34" opacity=".35"/>
-  <!-- trail -->
-  <path d="M230 850 Q380 640 515 360 L700 525 Q470 700 230 850 Z" fill="url(#tr)"/>
-  <path d="M280 805 Q430 660 560 520" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" opacity=".55"/>
-  <path d="M330 790 Q470 690 600 600" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".35"/>
-  <!-- comet -->
-  <circle cx="610" cy="430" r="190" fill="url(#gl)"/>
-  <circle cx="610" cy="430" r="125" fill="url(#cg)" stroke="#140f33" stroke-width="20"/>
-  <ellipse cx="565" cy="372" rx="40" ry="22" fill="#fff" opacity=".85" transform="rotate(-30 565 372)"/>
-  <ellipse cx="575" cy="445" rx="17" ry="24" fill="#140f33"/><ellipse cx="648" cy="445" rx="17" ry="24" fill="#140f33"/>
-  <circle cx="582" cy="435" r="7" fill="#fff"/><circle cx="655" cy="435" r="7" fill="#fff"/>
-  <path d="M592 490q20 18 40 0" fill="none" stroke="#140f33" stroke-width="12" stroke-linecap="round"/>
-  <ellipse cx="545" cy="490" rx="20" ry="11" fill="#ff4f8b" opacity=".5"/><ellipse cx="680" cy="490" rx="20" ry="11" fill="#ff4f8b" opacity=".5"/>
-  <!-- sparkle -->
-  <path d="M370 300Q382 336 418 348Q382 360 370 396Q358 360 322 348Q358 336 370 300Z" fill="url(#sf)" stroke="#a5520b" stroke-width="8" stroke-linejoin="round"/>
+  <defs><linearGradient id="pad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d7d2ff"/></linearGradient></defs>
+  <!-- gamepad -->
+  <path d="M330 380h364c80 0 120 80 128 190s-12 170-74 170c-50 0-78-70-120-92H396c-42 22-70 92-120 92-62 0-82-60-74-170s48-190 128-190z" fill="url(#pad)" stroke="#0b0720" stroke-width="30" stroke-linejoin="round"/>
+  <path d="M330 500v120M270 560h120" stroke="#0b0720" stroke-width="40" stroke-linecap="round"/>
+  <circle cx="660" cy="520" r="34" fill="#ff4d6d" stroke="#0b0720" stroke-width="14"/>
+  <circle cx="740" cy="590" r="34" fill="#3ddc84" stroke="#0b0720" stroke-width="14"/>
+  <circle cx="660" cy="640" r="30" fill="#ffc93c" stroke="#0b0720" stroke-width="14"/>
+  <circle cx="740" cy="480" r="30" fill="#3ab0ff" stroke="#0b0720" stroke-width="14"/>
+  <path d="M370 420h280" stroke="#fff" stroke-width="18" stroke-linecap="round" opacity=".8"/>
+  <!-- wifi waves -->
+  <path d="M420 300q92-70 184 0M380 250q132-100 264 0" fill="none" stroke="#ffd23f" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="512" cy="330" r="22" fill="#ffd23f"/>
 </svg>

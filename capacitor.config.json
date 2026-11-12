@@ -1,6 +1,6 @@
 {
-  "appId": "com.yblig.comethop",
-  "appName": "Comet Hop",
+  "appId": "com.yblig.mabarparty",
+  "appName": "Mabar Party",
   "webDir": "dist",
   "android": { "backgroundColor": "#000000" },
   "plugins": {

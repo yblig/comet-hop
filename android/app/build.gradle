@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.yblig.comethop"
+    namespace = "com.yblig.mabarparty"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.yblig.comethop"
+        applicationId "com.yblig.mabarparty"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode ((System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger())
