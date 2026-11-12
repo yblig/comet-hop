@@ -11,7 +11,7 @@ export default class Pause extends Phaser.Scene {
     const game = this.scene.get('Game');
     audio.duckMusic(true);
     this.m = modal(this, root => {
-      root.add(panel(this, 0, 0, 820, 900, 'PAUSED'));
+      root.add(panel(this, 0, 20, 820, 1000, 'PAUSED'));
       root.add(txt(this, 0, -270, 'SCORE', 40, HEX.dim, { stroke: 8 }));
       root.add(txt(this, 0, -195, fmt(game.score), 110, HEX.text, { stroke: 16 }));
       root.add(txt(this, 0, -100, `${game.hops} planets · ${game.sector.name}`, 38, HEX.cyan, { stroke: 8 }));
