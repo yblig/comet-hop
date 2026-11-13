@@ -7,7 +7,7 @@ import { hostScreen } from '../host/host.js';
 import { joinScreen } from '../controller/controller.js';
 import { TOOLS, openTool } from '../tools/index.js';
 import { isLite, setLite } from '../lite.js';
-import { listPads } from '../input/pads.js';
+import { activePads } from '../input/pads.js';
 
 export function homeScreen(root) {
   audio.playMusic('music_lobby');
@@ -24,7 +24,7 @@ export function homeScreen(root) {
   padBtn.querySelector('svg').classList.add('ico');
 
   const padInfo = h('div', { class: 'mini' });
-  const updPads = () => { const n = listPads().length; padInfo.textContent = n ? `🎮 ${n} stik terdeteksi — pilih "Jadi Layar" untuk main` : ''; };
+  const updPads = () => { const n = activePads().length; padInfo.textContent = n ? `🎮 ${n} stik aktif — pilih "Jadi Layar" untuk main` : ''; };
   updPads(); const pi = setInterval(updPads, 1500);
   const main = h('div', { class: 'home-main' },
     h('div', { class: 'home-hero' },

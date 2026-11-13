@@ -7,7 +7,7 @@ import { audio } from '../lib/audio.js';
 
 const SEL = '.btn:not([disabled]), .nav-item, .game-card, [data-nav], input.field, .code-boxes input, .toggle-row';
 let current = null;
-export const nav = { gameMode: false, onStart: null, padBack: true };
+export const nav = { gameMode: false, onStart: null, padBack: true, consume: null };
 
 function scope() {
   const ovs = document.querySelectorAll('.overlay');
@@ -84,6 +84,7 @@ onPad('key', (k, e) => {
 // controllers
 onPad('nav', dir => { if (!nav.gameMode) move(dir); });
 onPad('press', (p, i) => {
+  if (nav.consume?.(p, i)) return;
   if (nav.gameMode) {
     if (i === BTN.START || i === BTN.HOME) nav.onStart?.(p);
     return;

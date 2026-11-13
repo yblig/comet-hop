@@ -72,16 +72,23 @@ public class MainActivity extends BridgeActivity implements InputManager.InputDe
     }
 
     // ---------------------------------------------------------------- device detection
+    // A real game controller: not virtual, reports GAMEPAD (or JOYSTICK) and has a face button.
+    // This filters out the PS3/PS4 "Motion Sensors" / "Touchpad" sub-devices (axes but no
+    // buttons), TV remotes, keyboards and air-mice that also advertise joystick axes.
+    private static final java.util.regex.Pattern JUNK =
+        java.util.regex.Pattern.compile("(?i)motion|sensor|touchpad|accel|gyro|keyboard|remote|mouse|consumer|ir receiver|hdmi|cec");
     private static boolean isPadDevice(InputDevice d) {
         if (d == null || d.isVirtual()) return false;
+        String n = d.getName() == null ? "" : d.getName();
+        if (JUNK.matcher(n).find()) return false;
         int s = d.getSources();
-        return (s & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
-            || (s & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD && hasFaceButtons(d);
-    }
-
-    private static boolean hasFaceButtons(InputDevice d) {
-        boolean[] r = d.hasKeys(KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_BUTTON_B, KeyEvent.KEYCODE_BUTTON_X);
-        return r[0] && r[1] && r[2];
+        boolean gamepad = (s & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD;
+        boolean joystick = (s & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
+        if (!gamepad && !joystick) return false;
+        boolean[] k = d.hasKeys(KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_BUTTON_B, KeyEvent.KEYCODE_BUTTON_START);
+        if (!k[0]) return false;
+        // must also have a stick or a d-pad
+        return d.getMotionRange(MotionEvent.AXIS_X) != null || d.getMotionRange(MotionEvent.AXIS_HAT_X) != null || k[1] || k[2];
     }
 
     private static boolean fromPad(int source) {
@@ -142,7 +149,7 @@ public class MainActivity extends BridgeActivity implements InputManager.InputDe
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
         InputDevice d = e.getDevice();
-        if (fromPad(e.getSource()) && d != null && !d.isVirtual()) {
+        if (fromPad(e.getSource()) && isPadDevice(d)) {
             int b = bit(e.getKeyCode());
             if (b >= 0) {
                 if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
@@ -159,7 +166,7 @@ public class MainActivity extends BridgeActivity implements InputManager.InputDe
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent e) {
         InputDevice d = e.getDevice();
-        if ((e.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK && e.getAction() == MotionEvent.ACTION_MOVE && d != null) {
+        if ((e.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK && e.getAction() == MotionEvent.ACTION_MOVE && isPadDevice(d)) {
             Pad p = pad(d);
             p.lx = axis(e, d, MotionEvent.AXIS_X); p.ly = axis(e, d, MotionEvent.AXIS_Y);
             p.rx = axis(e, d, MotionEvent.AXIS_Z); p.ry = axis(e, d, MotionEvent.AXIS_RZ);

@@ -94,8 +94,9 @@ function padScreen(root, code) {
       case 'buzz': haptics[m.k]?.(); if (m.k === 'heavy' || m.k === 'error') body.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'none' }], { duration: 160 }); break;
       case 'quiz': quizMsg?.(m); break;
       case 'pong': ping.textContent = `sinyal ${Math.round(performance.now() - m.ts)} ms`; break;
-      case 'full': alive = false; cleanup(); go(joinScreen, code, 'Room sudah penuh (maks. 4 pemain).'); break;
+      case 'full': alive = false; cleanup(); go(joinScreen, code, 'Room penuh (maks. 4 pemain). Minta host mengeluarkan pemain yang tidak main.'); break;
       case 'bye': alive = false; cleanup(); go(joinScreen, '', 'Host menutup room.'); break;
+      case 'kicked': alive = false; cleanup(); go(joinScreen, code, 'Kamu dikeluarkan dari room oleh host.'); break;
     }
   });
   net.connect(code);

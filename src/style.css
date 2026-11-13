@@ -320,3 +320,10 @@ body.lite .overlay { background: rgba(6,3,20,.85); }
 .btnlights span { min-width: 34px; padding: 4px 6px; border-radius: 8px; border: 3px solid var(--outline); background: rgba(0,0,0,.35); font: 700 13px var(--body); }
 .btnlights span.on { background: var(--green); color: var(--outline); }
 .list-edit { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 900px; }
+/* v2.1: fit 4 player rows */
+.room-card { padding: 10px 12px; }
+.room-code { font-size: clamp(34px, 10.5vh, 80px); letter-spacing: 6px; }
+.room-card .steps { font-size: clamp(11px, 2.5vh, 15px); line-height: 1.25; }
+.plist { gap: 5px; }
+.prow { padding: 3px 8px; }
+.prow .avatar { width: clamp(24px, 6vh, 36px); }

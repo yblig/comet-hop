@@ -9,7 +9,7 @@ import { prefs } from '../state.js';
 import { GAMES, CATS } from '../games/index.js';
 import { CARDS } from '../games/cards.js';
 import { TOOLS, openTool } from '../tools/index.js';
-import { onPad, listPads, padInput, BTN } from '../input/pads.js';
+import { onPad, padInput, BTN } from '../input/pads.js';
 import { nav } from '../input/nav.js';
 import { settingsDialog } from '../screens/home.js';
 
@@ -40,12 +40,20 @@ class HostSession {
     this.net.on('leave', c => this.onLeave(c));
     this.net.start();
     // physical controllers
+    // A controller only becomes a player after it presses ✕ or START — so phantom devices
+    // (sensor sub-devices, TV remotes) never take a slot.
     this.offs = [
-      onPad('add', p => this.addPad(p)),
+      onPad('add', () => { if (!this._hinted) { this._hinted = true; toast('🎮 Stik terdeteksi — tekan ✕ untuk ikut main'); } }),
       onPad('remove', p => this.removePad(p)),
       onPad('press', (p, i) => this.onPadPress(p, i))
     ];
-    listPads().forEach(p => this.addPad(p, true));
+    nav.consume = (pad, i) => {
+      if (this.players.some(q => q?.kind === 'pad' && q.pad.id === pad.id && q.connected)) return false;
+      if (this.state !== 'lobby' && this.state !== 'tool') return false;
+      if (i !== BTN.A && i !== BTN.START) return false;
+      this.addPad(pad);
+      return true;
+    };
     const tick = () => {
       if (!this.alive) return;
       for (const pl of this.players) if (pl?.kind === 'pad') pl.input = padInput(pl.pad);
@@ -66,7 +74,7 @@ class HostSession {
     if (this.players.some(p => p?.kind === 'pad' && p.pad.id === pad.id)) return;
     const old = this.players.findIndex(p => p?.kind === 'pad' && p.padName === pad.name && !p.connected);
     let slot = old >= 0 ? old : this.players.findIndex(p => !p);
-    if (slot < 0) { if (!quiet) toast('Room penuh — stik ini belum bisa ikut'); return; }
+    if (slot < 0) { if (!quiet) { toast('Room penuh (4 pemain). Keluarkan pemain dulu di lobby.'); audio.play('wrong'); } return; }
     const n = this.list.filter(p => p.kind === 'pad').length + 1;
     const p = this.players[slot] || { slot, id: 'pad:' + pad.id, kind: 'pad', color: PCOLORS[slot], score: 0 };
     Object.assign(p, { pad, padName: pad.name, name: old >= 0 ? p.name : `Stik ${n}`, connected: true, input: blankInput() });
@@ -85,8 +93,7 @@ class HostSession {
   }
   onPadPress(pad, i) {
     let p = this.players.find(q => q?.kind === 'pad' && q.pad.id === pad.id);
-    if (!p && (i === BTN.A || i === BTN.START)) { this.addPad(pad); return; }
-    if (!p) return;
+    if (!p || !p.connected) return;
     // answer-style games: △ ○ ✕ □ → 0..3
     const ans = { [BTN.Y]: 0, [BTN.B]: 1, [BTN.A]: 2, [BTN.X]: 3 }[i];
     if (this.state === 'game' && ans != null) this.game?.onMsg?.(p, { t: 'ans', i: ans });
@@ -136,6 +143,13 @@ class HostSession {
     if (this.state === 'lobby') this.players[p.slot] = null;
     this.sendLayouts();
     this.refresh?.();
+  }
+
+  kick(p) {
+    if (p.kind === 'phone') { this.send(p, { t: 'kicked' }); setTimeout(() => p.conn?.close(), 300); }
+    this.players[p.slot] = null;
+    audio.play('leave'); toast(`${p.name} dikeluarkan`);
+    this.sendLayouts(); this.refresh?.();
   }
 
   send(p, m) { if (p?.connected && p.conn) p.conn.send(m); }
@@ -190,7 +204,7 @@ class HostSession {
     const playersEl = h('div', { class: 'plist' });
     const left = h('div', { class: 'card room-card' },
       h('div', { class: 'dim', style: { fontSize: '14px', letterSpacing: '2px' } }, 'KODE ROOM'), codeEl, status,
-      h('div', { class: 'steps' }, 'HP: buka Mabar Party → ', h('b', {}, 'Jadi Controller'), ' → ketik kode.', h('br'), 'Stik: colok/sambungkan, tekan ', h('b', {}, '✕'), '.'),
+      h('div', { class: 'steps' }, 'HP: buka Mabar Party → ', h('b', {}, 'Jadi Controller'), ' → ketik kode.', h('br'), 'Stik: tekan ', h('b', {}, '✕'), ' untuk ikut. Pilih nama pemain untuk mengeluarkan.'),
       playersEl);
 
     // tabs
@@ -207,12 +221,16 @@ class HostSession {
     const renderPlayers = joined => {
       playersEl.innerHTML = '';
       this.players.forEach((p, i) => {
-        const row = h('div', { class: 'prow' + (p ? '' : ' empty') + (joined === i ? ' joined' : '') },
+        const row = h('div', { class: 'prow' + (p ? '' : ' empty') + (joined === i ? ' joined' : ''), title: p ? 'Pilih untuk mengeluarkan' : '' },
           avatar(p ? p.color : '#5b5390', p ? (p.connected ? 'happy' : 'sleep') : 'sleep'),
           h('div', { class: 'grow nm' }, p ? p.name : `${PNAMES[i]} · kosong`),
           h('span', { class: 'dev' }, p ? (p.kind === 'pad' ? PAD_ICON : PHONE_ICON) : ''),
           p && p === this.vip ? h('span', { class: 'vip' }, 'PILIH') : null);
-        if (p) row.querySelector('.avatar').dataset.slot = i;
+        if (p) {
+          row.querySelector('.avatar').dataset.slot = i;
+          row.classList.add('nav-item');
+          row.addEventListener('click', () => confirmBox(`Keluarkan ${p.name}?`, p.kind === 'pad' ? 'Stik ini bisa ikut lagi dengan menekan ✕.' : 'HP ini bisa gabung lagi pakai kode room.', 'Keluarkan', () => this.kick(p)));
+        }
         playersEl.append(row);
       });
     };
@@ -305,7 +323,7 @@ class HostSession {
   leave() {
     confirmBox('Tutup room?', 'Semua controller akan terputus.', 'Tutup', () => {
       this.alive = false; cancelAnimationFrame(this.raf);
-      this.offs.forEach(f => f());
+      this.offs.forEach(f => f()); nav.consume = null;
       this.net.stop();
       session = null;
       import('../screens/home.js').then(m => go(m.homeScreen));

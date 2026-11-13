@@ -29,7 +29,7 @@ function setState(p, b, a) {
   const prev = p.b;
   p.b = b; p.a = a; p.seen = performance.now();
   const down = b & ~prev;
-  if (down) for (let i = 0; i < 17; i++) if (down & (1 << i)) emit('press', p, i);
+  if (down) { p.active = true; for (let i = 0; i < 17; i++) if (down & (1 << i)) emit('press', p, i); }
 }
 
 // ---------------------------------------------------------------- native bridge
@@ -103,6 +103,8 @@ export function stick(p) {
   return { x, y };
 }
 export function listPads() { return [...pads.values()]; }
+// pads that have pressed at least one button (real controllers in someone's hands)
+export function activePads() { return [...pads.values()].filter(p => p.active); }
 
 // Converts a pad into the generic player input every game reads.
 export function padInput(p) {

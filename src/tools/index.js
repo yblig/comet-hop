@@ -4,7 +4,7 @@ import { h, btn, toast } from '../ui/dom.js';
 import { audio } from '../lib/audio.js';
 import { haptics } from '../lib/haptics.js';
 import { storage } from '../lib/storage.js';
-import { listPads, BTN } from '../input/pads.js';
+import { listPads, activePads, BTN } from '../input/pads.js';
 import { isLite } from '../lite.js';
 import { native } from '../lib/native.js';
 import { TRUTH, DARE, TALK, CHARADES } from './decks.js';
@@ -310,7 +310,7 @@ export const TOOLS = [
     const upd = () => {
       const s = c.session, rows = [
         ['Kode room', s?.code || '— (buka dari lobby host)'], ['Pemain', s ? s.list.filter(p => p.connected).map(p => `${p.name} (${p.kind === 'pad' ? 'stik' : 'HP'})`).join(', ') || 'belum ada' : '-'],
-        ['Stik terdeteksi', listPads().map(p => p.name).join(', ') || 'tidak ada'], ['Internet', navigator.onLine ? 'tersambung ✅' : 'offline ❌'],
+        ['Stik aktif', activePads().map(p => p.name).join(', ') || 'tidak ada (tekan ✕ di stik)'], ['Perangkat mirip stik', String(listPads().length)], ['Internet', navigator.onLine ? 'tersambung ✅' : 'offline ❌'],
         ['Layar', `${innerWidth}×${innerHeight} (×${devicePixelRatio})`], ['Mode hemat', isLite() ? 'aktif (animasi minimal)' : 'mati'], ['Versi', 'Mabar Party 2.0']
       ];
       box.innerHTML = ''; rows.forEach(([k, v]) => box.append(h('div', { class: 'row', style: { justifyContent: 'space-between', gap: '20px', fontSize: '18px' } }, h('span', { class: 'dim' }, k), h('b', { style: { textAlign: 'right' } }, v))));
